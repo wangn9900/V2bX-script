@@ -372,7 +372,7 @@ http {
     default_type  application/octet-stream;
     
     server {
-        listen 127.0.0.1:8080;
+        listen 127.0.0.1:8080 http2;
         server_name _;
         root /usr/share/nginx/html;
         index index.html;
