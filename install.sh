@@ -268,70 +268,65 @@ EOF
         
         # Configure Nginx for local fallback 8080
         mkdir -p /usr/share/nginx/html
-        # Write a beautiful masquerade page
+        # Write Snake Game masquerade page
         cat > /usr/share/nginx/html/index.html <<EOF
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Space</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 0.5em;
-            background: -webkit-linear-gradient(#eee, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p {
-            font-size: 1.2em;
-            color: #cccccc;
-            line-height: 1.6;
-        }
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: #4a90e2;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #357abd;
-        }
-    </style>
+<title>Welcome</title>
+<style>
+html, body { height: 100%; margin: 0; background: #000; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif; flex-direction: column;}
+canvas { border: 1px solid white; }
+h1 { margin-bottom: 10px; }
+p { margin-top: 0; color: #aaa; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome</h1>
-        <p>This is my personal digital garden. I write about code, design, and life.</p>
-        <p>Simplicity is the ultimate sophistication.</p>
-        <a href="#" class="btn">Read More</a>
-    </div>
+<h1>System Update in Progress</h1>
+<p>Play Snake while you wait...</p>
+<canvas width="400" height="400" id="game"></canvas>
+<script>
+var canvas = document.getElementById('game');
+var context = canvas.getContext('2d');
+var grid = 16;
+var count = 0;
+var snake = {x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4};
+var apple = {x: 320, y: 320};
+function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+function loop() {
+  requestAnimationFrame(loop);
+  if (++count < 4) return;
+  count = 0;
+  context.clearRect(0,0,canvas.width,canvas.height);
+  snake.x += snake.dx; snake.y += snake.dy;
+  if (snake.x < 0) snake.x = canvas.width - grid; else if (snake.x >= canvas.width) snake.x = 0;
+  if (snake.y < 0) snake.y = canvas.height - grid; else if (snake.y >= canvas.height) snake.y = 0;
+  snake.cells.unshift({x: snake.x, y: snake.y});
+  if (snake.cells.length > snake.maxCells) snake.cells.pop();
+  context.fillStyle = 'red'; context.fillRect(apple.x, apple.y, grid-1, grid-1);
+  context.fillStyle = 'green';
+  snake.cells.forEach(function(cell, index) {
+    context.fillRect(cell.x, cell.y, grid-1, grid-1);
+    if (cell.x === apple.x && cell.y === apple.y) {
+      snake.maxCells++;
+      apple.x = getRandomInt(0, 25) * grid; apple.y = getRandomInt(0, 25) * grid;
+    }
+    for (var i = index + 1; i < snake.cells.length; i++) {
+        if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+            snake.x = 160; snake.y = 160; snake.cells = []; snake.maxCells = 4; snake.dx = grid; snake.dy = 0;
+            apple.x = getRandomInt(0, 25) * grid; apple.y = getRandomInt(0, 25) * grid;
+        }
+    }
+  });
+}
+document.addEventListener('keydown', function(e) {
+  if (e.which === 37 && snake.dx === 0) { snake.dx = -grid; snake.dy = 0; }
+  else if (e.which === 38 && snake.dy === 0) { snake.dy = -grid; snake.dx = 0; }
+  else if (e.which === 39 && snake.dx === 0) { snake.dx = grid; snake.dy = 0; }
+  else if (e.which === 40 && snake.dy === 0) { snake.dy = grid; snake.dx = 0; }
+});
+requestAnimationFrame(loop);
+</script>
 </body>
 </html>
 EOF
