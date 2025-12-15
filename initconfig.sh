@@ -118,9 +118,9 @@ add_node_config() {
                     "EnvName": "env1"
                 }
             }
-        },
 EOF
 )
+    fi
 
     nodes_config+=("$node_config")
 }
