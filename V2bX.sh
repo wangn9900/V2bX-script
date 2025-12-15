@@ -743,6 +743,10 @@ EOF
   "route": {
     "rules": [
       {
+        "ip_cidr": ["127.0.0.1/32"],
+        "outbound": "direct"
+      },
+      {
         "ip_is_private": true,
         "outbound": "block"
       },
