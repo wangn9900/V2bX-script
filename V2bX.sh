@@ -877,14 +877,104 @@ show_menu() {
   ${green}11.${plain} 一键安装 bbr (最新内核)
   ${green}12.${plain} 查看 V2bX 版本
   ${green}13.${plain} 生成 X25519 密钥
-  ${green}14.${plain} 升级 V2bX 维护脚本
-  ${green}15.${plain} 生成 V2bX 配置文件
-  ${green}16.${plain} 放行 VPS 的所有网络端口
-  ${green}17.${plain} 退出脚本
+
+uninstall_nginx() {
+    confirm "确定要卸载 Nginx (关闭伪装站) 吗?" "n"
+    if [[ $? != 0 ]]; then
+        show_menu
+        return 0
+    fi
+    echo -e "${yellow}正在卸载 Nginx...${plain}"
+    systemctl stop nginx
+    systemctl disable nginx
+    if [[ x"${release}" == x"centos" ]]; then
+        yum remove nginx -y
+    elif [[ x"${release}" == x"ubuntu" || x"${release}" == x"debian" ]]; then
+        apt-get remove nginx -y
+    elif [[ x"${release}" == x"alpine" ]]; then
+        apk del nginx
+    fi
+    rm -rf /etc/nginx/
+    echo -e "${green}Nginx 已卸载${plain}"
+    
+    if [[ $# == 0 ]]; then
+        before_show_menu
+    fi
+}
+
+install_reset_nginx() {
+    confirm "确定要安装/重置 Nginx 为监听 8080 端口吗？(这将覆盖现有 Nginx 配置)" "n"
+    if [[ $? != 0 ]]; then
+        show_menu
+        return 0
+    fi
+    echo -e "${yellow}正在安装/配置 Nginx...${plain}"
+    if [[ x"${release}" == x"centos" ]]; then
+        yum install nginx -y
+    elif [[ x"${release}" == x"ubuntu" || x"${release}" == x"debian" ]]; then
+        apt-get install nginx -y
+    elif [[ x"${release}" == x"alpine" ]]; then
+        apk add nginx
+    fi
+    
+    mkdir -p /usr/share/nginx/html
+    wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/wangn9900/V2bX-script/master/masquerade/index.html 2>/dev/null || echo "<h1>Welcome to my website!</h1>" > /usr/share/nginx/html/index.html
+    
+    cat > /etc/nginx/nginx.conf <<EOF
+user root;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    
+    server {
+        listen 127.0.0.1:8080;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+EOF
+    systemctl restart nginx
+    systemctl enable nginx
+    echo -e "${green}Nginx 安装/重置完成，监听端口: 8080${plain}"
+    
+    if [[ $# == 0 ]]; then
+        before_show_menu
+    fi
+}
+
+show_menu() {
+    echo -e "
+  ${green}V2bX 后端管理脚本，使用${plain} ${red}V2bX${plain} ${green}命令运行本脚本${plain}
+ ${green} 1.${plain} 安装 V2bX
+ ${green} 2.${plain} 更新 V2bX
+ ${green} 3.${plain} 卸载 V2bX
+ ${green} 4.${plain} 启动 V2bX
+ ${green} 5.${plain} 停止 V2bX
+ ${green} 6.${plain} 重启 V2bX
+ ${green} 7.${plain} 查看 V2bX 状态
+ ${green} 8.${plain} 查看 V2bX 日志
+ ${green} 9.${plain} 设置 V2bX 开机自启
+ ${green}10.${plain} 取消 V2bX 开机自启
+ ${green}11.${plain} 一键安装 bbr (原版/魔改/plus/锐速)
+ ${green}12.${plain} 查看 V2bX 版本 
+ ${green}13.${plain} 生成 x25519 密钥
+ ${green}14.${plain} 升级 V2bX 维护脚本
+ ${green}15.${plain} 生成 V2bX 配置文件
+ ${green}16.${plain} 放行 VPS 的所有网络端口
+ ${green}17.${plain} 安装/重置 Nginx (8080端口)
+ ${green}18.${plain} 卸载 Nginx
+ ${green} 0.${plain} 修改配置
  "
- #后续更新可加入上方字符串中
-    show_status
-    echo && read -rp "请输入选择 [0-17]: " num
+    echo && read -rp "请输入选择 [0-18]: " num
 
     case "${num}" in
         0) config ;;
@@ -904,8 +994,9 @@ show_menu() {
         14) update_shell ;;
         15) generate_config_file ;;
         16) open_ports ;;
-        17) exit ;;
-        *) echo -e "${red}请输入正确的数字 [0-16]${plain}" ;;
+        17) install_reset_nginx ;;
+        18) uninstall_nginx ;;
+        *) echo -e "${red}请输入正确的数字 [0-18]${plain}" ;;
     esac
 }
 
