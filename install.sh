@@ -253,6 +253,49 @@ EOF
         ln -s /usr/bin/V2bX /usr/bin/v2bx
         chmod +x /usr/bin/v2bx
     fi
+
+    # Install Masquerade Site (Nginx)
+    echo -e "${yellow}正在部署伪装站点 (Nginx)...${plain}"
+    if [[ x"${release}" == x"centos" ]]; then
+        yum install nginx -y
+    elif [[ x"${release}" == x"ubuntu" || x"${release}" == x"debian" ]]; then
+        apt-get install nginx -y
+    elif [[ x"${release}" == x"alpine" ]]; then
+        apk add nginx
+    fi
+    
+    # Configure Nginx for local fallback 80
+    mkdir -p /usr/share/nginx/html
+    # Download a simple masquerade template
+    wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/wangn9900/V2bX-script/master/masquerade/index.html 2>/dev/null || echo "<h1>Welcome to my website!</h1>" > /usr/share/nginx/html/index.html
+    
+    # Simple Nginx Config
+    cat > /etc/nginx/nginx.conf <<EOF
+user root;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    
+    server {
+        listen 127.0.0.1:80;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+EOF
+    systemctl restart nginx
+    systemctl enable nginx
+    echo -e "${green}伪装站点部署完成 (监听 127.0.0.1:80)${plain}"
+
     cd $cur_dir
     rm -f install.sh
     echo -e ""
