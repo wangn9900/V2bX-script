@@ -1022,6 +1022,12 @@ show_menu() {
  ${green}18.${plain} 卸载 Nginx
  ${green} 0.${plain} 修改配置
  "
+    echo
+    if systemctl is-active V2bX &>/dev/null ; then
+        echo -e "V2bX 状态: ${green}已启动${plain}"
+    else
+        echo -e "V2bX 状态: ${red}未启动${plain}"
+    fi
     echo && read -rp "请输入选择 [0-18]: " num
 
     case "${num}" in
