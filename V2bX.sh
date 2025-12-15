@@ -600,9 +600,7 @@ generate_config_file() {
 
 
     # 移除最后一个逗号并关闭数组
-    if [[ "$cores_config" == *"," ]]; then
-        cores_config="${cores_config%,}"
-    fi
+    cores_config="${cores_config%,}"
     cores_config+="]"
 
     # 切换到配置文件目录
