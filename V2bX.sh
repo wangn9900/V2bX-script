@@ -527,6 +527,7 @@ EOF
 )
 
     nodes_config+=("$node_config")
+    fi
 }
 
 generate_config_file() {
