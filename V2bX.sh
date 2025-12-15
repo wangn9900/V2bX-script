@@ -900,73 +900,93 @@ install_reset_nginx() {
     fi
     
     mkdir -p /usr/share/nginx/html
-    # Write a beautiful masquerade page
-    cat > /usr/share/nginx/html/index.html <<EOF
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Personal Space</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .container {
-            max-width: 800px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 0.5em;
-            background: -webkit-linear-gradient(#eee, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p {
-            font-size: 1.2em;
-            color: #cccccc;
-            line-height: 1.6;
-        }
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 30px;
-            background: #4a90e2;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #357abd;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome</h1>
-        <p>This is my personal digital garden. I write about code, design, and life.</p>
-        <p>Simplicity is the ultimate sophistication.</p>
-        <a href="#" class="btn">Read More</a>
-    </div>
-</body>
-</html>
+    echo -e "${yellow}请选择伪装站点主题/游戏：${plain}"
+    echo -e "  1. 贪吃蛇游戏 (Snake Game)"
+    echo -e "  2. 2048 游戏 (2048 Game, 简版)"
+    echo -e "  3. 黑客帝国代码雨 (Matrix Rain)"
+    echo -e "  4. 3D 星空背景 (Starfield)"
+    echo -e "  5. 粒子网络 (Particles)"
+    echo -e "  6. 极简技术博客 (Tech Blog)"
+    echo -e "  7. 炫酷时钟 (Digital Clock)"
+    echo -e "  8. 随机选择 (Random)"
+    read -rp "请输入选项 [1-8]: " theme_num
+    [[ -z "$theme_num" ]] && theme_num=1
+    if [[ "$theme_num" == "8" ]]; then
+        theme_num=$((RANDOM % 7 + 1))
+    fi
+
+    case "$theme_num" in
+        1) # Snake
+            cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><head><title>System Update</title><style>html,body{height:100%;margin:0;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;flex-direction:column}canvas{border:1px solid #fff}h1{margin-bottom:10px}p{color:#aaa}</style></head>
+<body><h1>System Update</h1><p>Play Snake while you wait...</p><canvas width="400" height="400" id="g"></canvas>
+<script>var c=document.getElementById('g'),x=c.getContext('2d'),g=16,n=0,s={x:160,y:160,dx:g,dy:0,c:[],m:4},a={x:320,y:320};
+function l(){requestAnimationFrame(l);if(++n<4)return;n=0;x.clearRect(0,0,400,400);s.x+=s.dx;s.y+=s.dy;if(s.x<0)s.x=384;if(s.x>384)s.x=0;if(s.y<0)s.y=384;if(s.y>384)s.y=0;s.c.unshift({x:s.x,y:s.y});if(s.c.length>s.m)s.c.pop();x.fillStyle='red';x.fillRect(a.x,a.y,15,15);x.fillStyle='lime';s.c.forEach((e,i)=>{x.fillRect(e.x,e.y,15,15);if(e.x===a.x&&e.y===a.y){s.m++;a.x=Math.floor(Math.random()*25)*16;a.y=Math.floor(Math.random()*25)*16}for(var j=i+1;j<s.c.length;j++)if(e.x===s.c[j].x&&e.y===s.c[j].y){s.x=160;s.y=160;s.c=[];s.m=4}})}
+document.onkeydown=e=>{if(e.which===37&&s.dx===0){s.dx=-g;s.dy=0}else if(e.which===38&&s.dy===0){s.dy=-g;s.dx=0}else if(e.which===39&&s.dx===0){s.dx=g;s.dy=0}else if(e.which===40&&s.dy===0){s.dy=g;s.dx=0}};requestAnimationFrame(l);</script></body></html>
 EOF
+            ;;
+        2) # 2048 (Simplified)
+             cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><head><title>2048</title><style>body{font-family:sans-serif;background:#faf8ef;color:#776e65;display:flex;flex-direction:column;align-items:center}#grid{display:grid;grid-template-columns:repeat(4,100px);gap:10px;background:#bbada0;padding:10px;border-radius:5px}.cell{width:100px;height:100px;background:#cdc1b4;font-size:40px;display:flex;justify-content:center;align-items:center;font-weight:bold;color:#fff}</style></head>
+<body><h1>2048</h1><div id="grid"></div><p>Use Arrow Keys to Play</p><script>
+const G=document.getElementById('grid');let b=Array(16).fill(0);function D(){G.innerHTML='';b.forEach(v=>{let c=document.createElement('div');c.className='cell';c.innerText=v||'';c.style.background=v?'#edc22e':(v?'#f2b179':'#cdc1b4');if(v>=8)c.style.color='#f9f6f2';G.appendChild(c)})}
+function A(){let e=b.map((v,i)=>v? -1:i).filter(i=>i!==-1);if(e.length)b[e[Math.floor(Math.random()*e.length)]]=Math.random()>.9?4:2}
+function M(d){let c=false;for(let i=0;i<4;i++){let r=d%2!==0?[i*4,i*4+1,i*4+2,i*4+3]:[i,i+4,i+8,i+12];let v=r.map(k=>b[k]).filter(x=>x);if(d===1||d===2)v.reverse();
+for(let j=0;j<v.length-1;j++)if(v[j]===v[j+1]){v[j]*=2;v.splice(j+1,1);c=true}while(v.length<4)v.push(0);if(d===1||d===2)v.reverse();
+r.forEach((k,x)=>{if(b[k]!==v[x])c=true;b[k]=v[x]})}return c}
+window.onkeydown=e=>{let m=false;if(e.code=='ArrowUp')m=M(0);else if(e.code=='ArrowRight')m=M(1);else if(e.code=='ArrowDown')m=M(2);else if(e.code=='ArrowLeft')m=M(3);if(m){A();D()}};A();A();D();</script></body></html>
+EOF
+            ;;
+        3) # Matrix Rain
+            cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><body style="margin:0;overflow:hidden;background:#000"><canvas id="c"></canvas><script>
+var c=document.getElementById("c"),x=c.getContext("2d"),w=c.width=window.innerWidth,h=c.height=window.innerHeight;
+var s='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',a=s.split(''),f=16,p=Array(Math.floor(w/f)).fill(0);
+function d(){x.fillStyle='rgba(0,0,0,0.05)';x.fillRect(0,0,w,h);x.fillStyle='#0F0';x.font=f+'px monospace';
+p.forEach((y,i)=>{var t=a[Math.floor(Math.random()*a.length)];x.fillText(t,i*f,y*f);
+if(y*f>h&&Math.random()>0.975)p[i]=0;p[i]++})};setInterval(d,33);window.onresize=()=>location.reload();
+</script></body></html>
+EOF
+            ;;
+        4) # Starfield
+            cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><body style="background:#000;overflow:hidden;margin:0"><canvas id="c"></canvas><script>
+var c=document.getElementById('c'),x=c.getContext('2d'),w=c.width=window.innerWidth,h=c.height=window.innerHeight,S=[];
+for(var i=0;i<800;i++)S.push({x:Math.random()*w,y:Math.random()*h,z:Math.random()*w});
+function d(){x.fillStyle='black';x.fillRect(0,0,w,h);x.fillStyle='white';
+S.forEach(s=>{s.z-=2;if(s.z<=0){s.x=Math.random()*w;s.y=Math.random()*h;s.z=w}
+var k=128/s.z,px=(s.x-w/2)*k+w/2,py=(s.y-h/2)*k+h/2;if(px>0&&px<w&&py>0&&py<h){x.fillRect(px,py,1.5,1.5)}});requestAnimationFrame(d)}
+d();window.onresize=()=>location.reload();</script></body></html>
+EOF
+            ;;
+        5) # Particles
+             cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><body style="margin:0;overflow:hidden;background:#1a1a1a"><canvas id="c"></canvas><script>
+var c=document.getElementById('c'),ctx=c.getContext('2d'),w=c.width=window.innerWidth,h=c.height=window.innerHeight,p=[];
+for(var i=0;i<100;i++)p.push({x:Math.random()*w,y:Math.random()*h,vx:Math.random()*2-1,vy:Math.random()*2-1});
+function l(){ctx.fillStyle='rgba(26,26,26,0.3)';ctx.fillRect(0,0,w,h);ctx.fillStyle='#00d2ff';
+p.forEach((a,i)=>{a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>w)a.vx*=-1;if(a.y<0||a.y>h)a.vy*=-1;ctx.beginPath();ctx.arc(a.x,a.y,2,0,Math.PI*2);ctx.fill();
+p.slice(i+1).forEach(b=>{var d=Math.hypot(a.x-b.x,a.y-b.y);if(d<100){ctx.beginPath();ctx.strokeStyle='rgba(0,210,255,'+(1-d/100)+')';ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}})});requestAnimationFrame(l)}
+l();</script></body></html>
+EOF
+            ;;
+        6) # Tech Blog
+            cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html lang="en"><head><title>My Blog</title><style>body{font-family:'Segoe UI',sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;color:#333;background:#f4f4f4}header{background:#333;color:#fff;padding:20px;text-align:center;border-radius:5px}article{background:#fff;padding:20px;margin-bottom:20px;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}h1{margin:0}a{color:#007bff;text-decoration:none}a:hover{text-decoration:underline}</style></head>
+<body><header><h1>TechnoSpace</h1><p>Coding, Coffee, and Chaos</p></header></br>
+<article><h2>Welcome to my world</h2><p>This is a place where I share my thoughts on technology, programming, and the future of AI. Stay tuned for updates.</p><a href="#">Read more...</a></article>
+<article><h2>Why Linux?</h2><p>Linux is the kernel of choice for servers, embedded systems, and supercomputers. Here's why I love it...</p><a href="#">Read more...</a></article>
+<article><h2>The Future of WebAssembly</h2><p>WebAssembly (Wasm) is a binary instruction format for a stack-based virtual machine. It is designed as a portable compilation target...</p><a href="#">Read more...</a></article>
+</body></html>
+EOF
+            ;;
+        7) # Digital Clock
+            cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html><html><body style="background:#000;color:#0f0;display:flex;justify-content:center;align-items:center;height:100vh;font-family:monospace;font-size:15vw;margin:0"><div id="c"></div><script>
+setInterval(()=>document.getElementById('c').innerText=new Date().toLocaleTimeString(),1000)</script></body></html>
+EOF
+            ;;
+    esac
     
     cat > /etc/nginx/nginx.conf <<EOF
 user root;
