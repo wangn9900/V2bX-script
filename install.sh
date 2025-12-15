@@ -268,8 +268,73 @@ EOF
         
         # Configure Nginx for local fallback 8080
         mkdir -p /usr/share/nginx/html
-        # Download a simple masquerade template
-        wget -O /usr/share/nginx/html/index.html https://raw.githubusercontent.com/wangn9900/V2bX-script/master/masquerade/index.html 2>/dev/null || echo "<h1>Welcome to my website!</h1>" > /usr/share/nginx/html/index.html
+        # Write a beautiful masquerade page
+        cat > /usr/share/nginx/html/index.html <<EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Space</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+            background: -webkit-linear-gradient(#eee, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p {
+            font-size: 1.2em;
+            color: #cccccc;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: #4a90e2;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome</h1>
+        <p>This is my personal digital garden. I write about code, design, and life.</p>
+        <p>Simplicity is the ultimate sophistication.</p>
+        <a href="#" class="btn">Read More</a>
+    </div>
+</body>
+</html>
+EOF
         
         # Simple Nginx Config
         cat > /etc/nginx/nginx.conf <<EOF
