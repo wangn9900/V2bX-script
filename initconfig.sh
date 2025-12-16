@@ -250,6 +250,12 @@ EOF
         },
         {
             "outboundTag": "block",
+            "ip": [
+                "geoip:private"
+            ]
+        },
+        {
+            "outboundTag": "block",
             "domain": [
                 "regexp:(api|ps|sv|offnavi|newvector|ulog.imap|newloc)(.map|).(baidu|n.shifen).com",
                 "regexp:(.+.|^)(360|so).(cn|com)",
