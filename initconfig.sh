@@ -250,12 +250,6 @@ EOF
         },
         {
             "outboundTag": "block",
-            "ip": [
-                "geoip:private"
-            ]
-        },
-        {
-            "outboundTag": "block",
             "domain": [
                 "regexp:(api|ps|sv|offnavi|newvector|ulog.imap|newloc)(.map|).(baidu|n.shifen).com",
                 "regexp:(.+.|^)(360|so).(cn|com)",
@@ -339,10 +333,6 @@ EOF
       {
         "ip_cidr": ["127.0.0.1/32"],
         "outbound": "direct"
-      },
-      {
-        "ip_is_private": true,
-        "outbound": "block"
       },
       {
         "domain_regex": [
