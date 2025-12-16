@@ -11,9 +11,17 @@ check_ipv6_support() {
 }
 
 add_node_config() {
-    core="sing"
+    echo -e "${yellow}请选择核心类型：${plain}"
+    echo -e "${green}1. Sing-box (默认)${plain}"
+    echo -e "${green}2. Xray${plain}"
+    echo -e "${green}3. Hysteria2${plain}"
+    read -rp "请输入 [1-3]: " core_select
+    case "$core_select" in
+        2) core="xray" ;;
+        3) core="hysteria2" ;;
+        *) core="sing" ;;
+    esac
     core_sing=true
-    echo -e "${green}核心类型已强制锁定为: singbox${plain}"
     while true; do
         read -rp "请输入节点Node ID：" NodeID
         # 判断NodeID是否为正整数
