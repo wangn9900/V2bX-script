@@ -243,6 +243,12 @@ EOF
     "domainStrategy": "AsIs",
     "rules": [
         {
+            "outboundTag": "IPv4_out",
+            "ip": [
+                "127.0.0.1/32"
+            ]
+        },
+        {
             "outboundTag": "block",
             "ip": [
                 "geoip:private"
@@ -278,7 +284,6 @@ EOF
         {
             "outboundTag": "block",
             "ip": [
-                "127.0.0.1/32",
                 "10.0.0.0/8",
                 "fc00::/7",
                 "fe80::/10",
