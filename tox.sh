@@ -82,7 +82,7 @@ confirm() {
 }
 
 confirm_restart() {
-    confirm "是否重启V2bX" "y"
+    confirm "是否重启tox" "y"
     if [[ $? == 0 ]]; then
         restart
     else
@@ -114,7 +114,7 @@ update() {
     fi
     bash <(curl -Ls https://raw.githubusercontent.com/wangn9900/V2bX-script/master/install.sh) $version
     if [[ $? == 0 ]]; then
-        echo -e "${green}更新完成，已自动重启 V2bX，请使用 V2bX log 查看运行日志${plain}"
+        echo -e "${green}更新完成，已自动重启 tox，请使用 tox log 查看运行日志${plain}"
         exit
     fi
 
@@ -124,17 +124,17 @@ update() {
 }
 
 config() {
-    echo "V2bX在修改配置后会自动尝试重启"
-    vi /etc/V2bX/config.json
+    echo "tox在修改配置后会自动尝试重启"
+    vi /etc/tox/config.json
     sleep 2
     restart
     check_status
     case $? in
         0)
-            echo -e "V2bX状态: ${green}已运行${plain}"
+            echo -e "tox状态: ${green}已运行${plain}"
             ;;
         1)
-            echo -e "检测到您未启动V2bX或V2bX自动重启失败，是否查看日志？[Y/n]" && echo
+            echo -e "检测到您未启动tox或tox自动重启失败，是否查看日志？[Y/n]" && echo
             read -e -rp "(默认: y):" yn
             [[ -z ${yn} ]] && yn="y"
             if [[ ${yn} == [Yy] ]]; then
@@ -142,12 +142,12 @@ config() {
             fi
             ;;
         2)
-            echo -e "V2bX状态: ${red}未安装${plain}"
+            echo -e "tox状态: ${red}未安装${plain}"
     esac
 }
 
 uninstall() {
-    confirm "确定要卸载 V2bX 吗?" "n"
+    confirm "确定要卸载 tox 吗?" "n"
     if [[ $? != 0 ]]; then
         if [[ $# == 0 ]]; then
             show_menu
@@ -155,21 +155,21 @@ uninstall() {
         return 0
     fi
     if [[ x"${release}" == x"alpine" ]]; then
-        service V2bX stop
-        rc-update del V2bX
-        rm /etc/init.d/V2bX -f
+        service tox stop
+        rc-update del tox
+        rm /etc/init.d/tox -f
     else
-        systemctl stop V2bX
-        systemctl disable V2bX
-        rm /etc/systemd/system/V2bX.service -f
+        systemctl stop tox
+        systemctl disable tox
+        rm /etc/systemd/system/tox.service -f
         systemctl daemon-reload
         systemctl reset-failed
     fi
-    rm /etc/V2bX/ -rf
-    rm /usr/local/V2bX/ -rf
+    rm /etc/tox/ -rf
+    rm /usr/local/tox/ -rf
 
     echo ""
-    echo -e "卸载成功，如果你想删除此脚本，则退出脚本后运行 ${green}rm /usr/bin/V2bX -f${plain} 进行删除"
+    echo -e "卸载成功，如果你想删除此脚本，则退出脚本后运行 ${green}rm /usr/bin/tox -f${plain} 进行删除"
     echo ""
 
     if [[ $# == 0 ]]; then
@@ -181,19 +181,19 @@ start() {
     check_status
     if [[ $? == 0 ]]; then
         echo ""
-        echo -e "${green}V2bX已运行，无需再次启动，如需重启请选择重启${plain}"
+        echo -e "${green}tox已运行，无需再次启动，如需重启请选择重启${plain}"
     else
         if [[ x"${release}" == x"alpine" ]]; then
-            service V2bX start
+            service tox start
         else
-            systemctl start V2bX
+            systemctl start tox
         fi
         sleep 2
         check_status
         if [[ $? == 0 ]]; then
-            echo -e "${green}V2bX 启动成功，请使用 V2bX log 查看运行日志${plain}"
+            echo -e "${green}tox 启动成功，请使用 tox log 查看运行日志${plain}"
         else
-            echo -e "${red}V2bX可能启动失败，请稍后使用 V2bX log 查看日志信息${plain}"
+            echo -e "${red}tox可能启动失败，请稍后使用 tox log 查看日志信息${plain}"
         fi
     fi
 
@@ -204,16 +204,16 @@ start() {
 
 stop() {
     if [[ x"${release}" == x"alpine" ]]; then
-        service V2bX stop
+        service tox stop
     else
-        systemctl stop V2bX
+        systemctl stop tox
     fi
     sleep 2
     check_status
     if [[ $? == 1 ]]; then
-        echo -e "${green}V2bX 停止成功${plain}"
+        echo -e "${green}tox 停止成功${plain}"
     else
-        echo -e "${red}V2bX停止失败，可能是因为停止时间超过了两秒，请稍后查看日志信息${plain}"
+        echo -e "${red}tox停止失败，可能是因为停止时间超过了两秒，请稍后查看日志信息${plain}"
     fi
 
     if [[ $# == 0 ]]; then
@@ -223,16 +223,16 @@ stop() {
 
 restart() {
     if [[ x"${release}" == x"alpine" ]]; then
-        service V2bX restart
+        service tox restart
     else
-        systemctl restart V2bX
+        systemctl restart tox
     fi
     sleep 2
     check_status
     if [[ $? == 0 ]]; then
-        echo -e "${green}V2bX 重启成功，请使用 V2bX log 查看运行日志${plain}"
+        echo -e "${green}tox 重启成功，请使用 tox log 查看运行日志${plain}"
     else
-        echo -e "${red}V2bX可能启动失败，请稍后使用 V2bX log 查看日志信息${plain}"
+        echo -e "${red}tox可能启动失败，请稍后使用 tox log 查看日志信息${plain}"
     fi
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -252,14 +252,14 @@ status() {
 
 enable() {
     if [[ x"${release}" == x"alpine" ]]; then
-        rc-update add V2bX
+        rc-update add tox
     else
-        systemctl enable V2bX
+        systemctl enable tox
     fi
     if [[ $? == 0 ]]; then
-        echo -e "${green}V2bX 设置开机自启成功${plain}"
+        echo -e "${green}tox 设置开机自启成功${plain}"
     else
-        echo -e "${red}V2bX 设置开机自启失败${plain}"
+        echo -e "${red}tox 设置开机自启失败${plain}"
     fi
 
     if [[ $# == 0 ]]; then
@@ -269,14 +269,14 @@ enable() {
 
 disable() {
     if [[ x"${release}" == x"alpine" ]]; then
-        rc-update del V2bX
+        rc-update del tox
     else
-        systemctl disable V2bX
+        systemctl disable tox
     fi
     if [[ $? == 0 ]]; then
-        echo -e "${green}V2bX 取消开机自启成功${plain}"
+        echo -e "${green}tox 取消开机自启成功${plain}"
     else
-        echo -e "${red}V2bX 取消开机自启失败${plain}"
+        echo -e "${red}tox 取消开机自启失败${plain}"
     fi
 
     if [[ $# == 0 ]]; then
@@ -288,7 +288,7 @@ show_log() {
     if [[ x"${release}" == x"alpine" ]]; then
         echo -e "${red}alpine系统暂不支持日志查看${plain}\n" && exit 1
     else
-        journalctl -u V2bX.service -e --no-pager -f
+        journalctl -u tox.service -e --no-pager -f
     fi
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -300,31 +300,31 @@ install_bbr() {
 }
 
 update_shell() {
-    wget -O /usr/bin/V2bX -N --no-check-certificate https://raw.githubusercontent.com/wangn9900/V2bX-script/master/V2bX.sh
+    wget -O /usr/bin/tox -N --no-check-certificate https://raw.githubusercontent.com/wangn9900/V2bX-script/master/tox.sh
     if [[ $? != 0 ]]; then
         echo ""
         echo -e "${red}下载脚本失败，请检查本机能否连接 Github${plain}"
         before_show_menu
     else
-        chmod +x /usr/bin/V2bX
+        chmod +x /usr/bin/tox
         echo -e "${green}升级脚本成功，请重新运行脚本${plain}" && exit 0
     fi
 }
 
 # 0: running, 1: not running, 2: not installed
 check_status() {
-    if [[ ! -f /usr/local/V2bX/V2bX ]]; then
+    if [[ ! -f /usr/local/tox/tox ]]; then
         return 2
     fi
     if [[ x"${release}" == x"alpine" ]]; then
-        temp=$(service V2bX status | awk '{print $3}')
+        temp=$(service tox status | awk '{print $3}')
         if [[ x"${temp}" == x"started" ]]; then
             return 0
         else
             return 1
         fi
     else
-        temp=$(systemctl status V2bX | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+        temp=$(systemctl status tox | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
         if [[ x"${temp}" == x"running" ]]; then
             return 0
         else
@@ -335,14 +335,14 @@ check_status() {
 
 check_enabled() {
     if [[ x"${release}" == x"alpine" ]]; then
-        temp=$(rc-update show | grep V2bX)
+        temp=$(rc-update show | grep tox)
         if [[ x"${temp}" == x"" ]]; then
             return 1
         else
             return 0
         fi
     else
-        temp=$(systemctl is-enabled V2bX)
+        temp=$(systemctl is-enabled tox)
         if [[ x"${temp}" == x"enabled" ]]; then
             return 0
         else
@@ -355,7 +355,7 @@ check_uninstall() {
     check_status
     if [[ $? != 2 ]]; then
         echo ""
-        echo -e "${red}V2bX已安装，请不要重复安装${plain}"
+        echo -e "${red}tox已安装，请不要重复安装${plain}"
         if [[ $# == 0 ]]; then
             before_show_menu
         fi
@@ -369,7 +369,7 @@ check_install() {
     check_status
     if [[ $? == 2 ]]; then
         echo ""
-        echo -e "${red}请先安装V2bX${plain}"
+        echo -e "${red}请先安装tox${plain}"
         if [[ $# == 0 ]]; then
             before_show_menu
         fi
@@ -383,15 +383,15 @@ show_status() {
     check_status
     case $? in
         0)
-            echo -e "V2bX状态: ${green}已运行${plain}"
+            echo -e "tox状态: ${green}已运行${plain}"
             show_enable_status
             ;;
         1)
-            echo -e "V2bX状态: ${yellow}未运行${plain}"
+            echo -e "tox状态: ${yellow}未运行${plain}"
             show_enable_status
             ;;
         2)
-            echo -e "V2bX状态: ${red}未安装${plain}"
+            echo -e "tox状态: ${red}未安装${plain}"
     esac
 }
 
@@ -406,7 +406,7 @@ show_enable_status() {
 
 generate_x25519_key() {
     echo -n "正在生成 x25519 密钥："
-    /usr/local/V2bX/V2bX x25519
+    /usr/local/tox/tox x25519
     echo ""
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -414,8 +414,8 @@ generate_x25519_key() {
 }
 
 show_V2bX_version() {
-    echo -n "V2bX 版本："
-    /usr/local/V2bX/V2bX version
+    echo -n "tox 版本："
+    /usr/local/tox/tox version
     echo ""
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -486,7 +486,7 @@ add_node_config() {
         esac
         read -rp "请输入节点证书域名(example.com)：" certdomain
         if [ "$certmode" != "http" ]; then
-            echo -e "${red}请手动修改配置文件后重启V2bX！${plain}"
+            echo -e "${red}请手动修改配置文件后重启tox！${plain}"
         fi
     fi
     ipv6_support=$(check_ipv6_support)
@@ -514,8 +514,8 @@ add_node_config() {
                 "CertMode": "$certmode",
                 "RejectUnknownSni": false,
                 "CertDomain": "$certdomain",
-                "CertFile": "/etc/V2bX/fullchain.cer",
-                "KeyFile": "/etc/V2bX/cert.key",
+                "CertFile": "/etc/tox/fullchain.cer",
+                "KeyFile": "/etc/tox/cert.key",
                 "Email": "v2bx@github.com",
                 "Provider": "cloudflare",
                 "DNSEnv": {
@@ -531,7 +531,7 @@ EOF
 }
 
 generate_config_file() {
-    echo -e "${yellow}V2bX 配置文件生成向导${plain}"
+    echo -e "${yellow}tox 配置文件生成向导${plain}"
     echo -e "${red}请阅读以下注意事项：${plain}"
     echo -e "${red}1. 目前该功能正处测试阶段${plain}"
     echo -e "${red}2. 生成的配置文件会保存到 /etc/V2bX/config.json${plain}"

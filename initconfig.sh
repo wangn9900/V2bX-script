@@ -102,8 +102,8 @@ add_node_config() {
                 "CertMode": "$certmode",
                 "RejectUnknownSni": false,
                 "CertDomain": "$certdomain",
-                "CertFile": "/etc/V2bX/fullchain.cer",
-                "KeyFile": "/etc/V2bX/cert.key",
+                "CertFile": "/etc/tox/fullchain.cer",
+                "KeyFile": "/etc/tox/cert.key",
                 "Email": "v2bx@github.com",
                 "Provider": "cloudflare",
                 "DNSEnv": {
@@ -121,8 +121,8 @@ generate_config_file() {
     echo -e "${yellow}V2bX 配置文件生成向导${plain}"
     echo -e "${red}请阅读以下注意事项：${plain}"
     echo -e "${red}1. 目前该功能正处测试阶段${plain}"
-    echo -e "${red}2. 生成的配置文件会保存到 /etc/V2bX/config.json${plain}"
-    echo -e "${red}3. 原来的配置文件会保存到 /etc/V2bX/config.json.bak${plain}"
+    echo -e "${red}2. 生成的配置文件会保存到 /etc/tox/config.json${plain}"
+    echo -e "${red}3. 原来的配置文件会保存到 /etc/tox/config.json.bak${plain}"
     echo -e "${red}4. 目前仅部分支持TLS${plain}"
     echo -e "${red}5. 使用此功能生成的配置文件会自带审计，确定继续？(y/n)${plain}"
     read -rp "请输入：" continue_prompt
@@ -181,7 +181,7 @@ generate_config_file() {
             \"Server\": \"time.apple.com\",
             \"ServerPort\": 0
         },
-        \"OriginalPath\": \"/etc/V2bX/sing_origin.json\"
+        \"OriginalPath\": \"/etc/tox/sing_origin.json\"
     },"
     fi
 
@@ -193,7 +193,7 @@ generate_config_file() {
     cores_config=$(echo "$cores_config" | sed 's/},]$/}]/')
 
     # 切换到配置文件目录
-    cd /etc/V2bX
+    cd /etc/tox
     
     # 备份旧的配置文件
     mv config.json config.json.bak
@@ -201,7 +201,7 @@ generate_config_file() {
     formatted_nodes_config="${nodes_config_str%,}"
 
     # 创建 config.json 文件
-    cat <<EOF > /etc/V2bX/config.json
+    cat <<EOF > /etc/tox/config.json
 {
     "Log": {
         "Level": "error",
@@ -213,7 +213,7 @@ generate_config_file() {
 EOF
     
     # 创建 custom_outbound.json 文件
-    cat <<EOF > /etc/V2bX/custom_outbound.json
+    cat <<EOF > /etc/tox/custom_outbound.json
 [
     {
         "tag": "IPv4_out",
@@ -237,7 +237,7 @@ EOF
 EOF
     
     # 创建 route.json 文件
-    cat <<EOF > /etc/V2bX/route.json
+    cat <<EOF > /etc/tox/route.json
 {
     "domainStrategy": "AsIs",
     "rules": [
@@ -303,7 +303,7 @@ EOF
         dnsstrategy="prefer_ipv4"
     fi
     # 创建 sing_origin.json 文件
-    cat <<EOF > /etc/V2bX/sing_origin.json
+    cat <<EOF > /etc/tox/sing_origin.json
 {
   "dns": {
     "servers": [
@@ -378,7 +378,7 @@ EOF
 EOF
 
     # 创建 hy2config.yaml 文件           
-    cat <<EOF > /etc/V2bX/hy2config.yaml
+    cat <<EOF > /etc/tox/hy2config.yaml
 quic:
   initStreamReceiveWindow: 8388608
   maxStreamReceiveWindow: 8388608
@@ -401,5 +401,5 @@ masquerade:
   type: 404
 EOF
     echo -e "${green}V2bX 配置文件生成完成,正在重新启动服务${plain}"
-    v2bx restart
+    tox restart
 }

@@ -103,18 +103,18 @@ install_base() {
 
 # 0: running, 1: not running, 2: not installed
 check_status() {
-    if [[ ! -f /usr/local/V2bX/V2bX ]]; then
+    if [[ ! -f /usr/local/tox/tox ]]; then
         return 2
     fi
     if [[ x"${release}" == x"alpine" ]]; then
-        temp=$(service V2bX status | awk '{print $3}')
+        temp=$(service tox status | awk '{print $3}')
         if [[ x"${temp}" == x"started" ]]; then
             return 0
         else
             return 1
         fi
     else
-        temp=$(systemctl status V2bX | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
+        temp=$(systemctl status tox | grep Active | awk '{print $3}' | cut -d "(" -f2 | cut -d ")" -f1)
         if [[ x"${temp}" == x"running" ]]; then
             return 0
         else
@@ -124,21 +124,21 @@ check_status() {
 }
 
 install_V2bX() {
-    if [[ -e /usr/local/V2bX/ ]]; then
-        rm -rf /usr/local/V2bX/
+    if [[ -e /usr/local/tox/ ]]; then
+        rm -rf /usr/local/tox/
     fi
 
-    mkdir /usr/local/V2bX/ -p
-    cd /usr/local/V2bX/
+    mkdir /usr/local/tox/ -p
+    cd /usr/local/tox/
 
     if  [ $# == 0 ] ;then
         last_version=$(curl -Ls "https://api.github.com/repos/wangn9900/V2bX/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
         if [[ ! -n "$last_version" ]]; then
-            echo -e "${red}检测 V2bX 版本失败，可能是超出 Github API 限制，请稍后再试，或手动指定 V2bX 版本安装${plain}"
+            echo -e "${red}检测 tox 版本失败，可能是超出 Github API 限制，请稍后再试，或手动指定 tox 版本安装${plain}"
             exit 1
         fi
-        echo -e "检测到 V2bX 最新版本：${last_version}，开始安装"
-        wget --no-check-certificate -N --progress=bar -O /usr/local/V2bX/V2bX-linux.zip https://github.com/wangn9900/V2bX/releases/download/${last_version}/V2bX-linux-${arch}.zip
+        echo -e "检测到 tox 最新版本：${last_version}，开始安装"
+        wget --no-check-certificate -N --progress=bar -O /usr/local/tox/V2bX-linux.zip https://github.com/wangn9900/V2bX/releases/download/${last_version}/V2bX-linux-${arch}.zip
         if [[ $? -ne 0 ]]; then
             echo -e "${red}下载 V2bX 失败，请确保你的服务器能够下载 Github 的文件${plain}"
             exit 1
@@ -146,47 +146,51 @@ install_V2bX() {
     else
         last_version=$1
         url="https://github.com/wangn9900/V2bX/releases/download/${last_version}/V2bX-linux-${arch}.zip"
-        echo -e "开始安装 V2bX $1"
-        wget --no-check-certificate -N --progress=bar -O /usr/local/V2bX/V2bX-linux.zip ${url}
+        echo -e "开始安装 tox $1"
+        wget --no-check-certificate -N --progress=bar -O /usr/local/tox/V2bX-linux.zip ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}下载 V2bX $1 失败，请确保此版本存在${plain}"
+            echo -e "${red}下载 tox $1 失败，请确保此版本存在${plain}"
             exit 1
         fi
     fi
 
     unzip V2bX-linux.zip
     rm V2bX-linux.zip -f
-    chmod +x V2bX
-    mkdir /etc/V2bX/ -p
-    cp geoip.dat /etc/V2bX/
-    cp geosite.dat /etc/V2bX/
+    # Rename binary to tox
+    if [[ -f V2bX ]]; then
+        mv V2bX tox
+    fi
+    chmod +x tox
+    mkdir /etc/tox/ -p
+    cp geoip.dat /etc/tox/
+    cp geosite.dat /etc/tox/
     if [[ x"${release}" == x"alpine" ]]; then
-        rm /etc/init.d/V2bX -f
-        cat <<EOF > /etc/init.d/V2bX
+        rm /etc/init.d/tox -f
+        cat <<EOF > /etc/init.d/tox
 #!/sbin/openrc-run
 
-name="V2bX"
-description="V2bX"
+name="tox"
+description="tox"
 
-command="/usr/local/V2bX/V2bX"
+command="/usr/local/tox/tox"
 command_args="server"
 command_user="root"
 
-pidfile="/run/V2bX.pid"
+pidfile="/run/tox.pid"
 command_background="yes"
 
 depend() {
         need net
 }
 EOF
-        chmod +x /etc/init.d/V2bX
-        rc-update add V2bX default
-        echo -e "${green}V2bX ${last_version}${plain} 安装完成，已设置开机自启"
+        chmod +x /etc/init.d/tox
+        rc-update add tox default
+        echo -e "${green}tox ${last_version}${plain} 安装完成，已设置开机自启"
     else
-        rm /etc/systemd/system/V2bX.service -f
-        cat <<EOF > /etc/systemd/system/V2bX.service
+        rm /etc/systemd/system/tox.service -f
+        cat <<EOF > /etc/systemd/system/tox.service
 [Unit]
-Description=V2bX Service
+Description=tox Service
 After=network.target nss-lookup.target
 Wants=network.target
 
@@ -198,8 +202,8 @@ LimitAS=infinity
 LimitRSS=infinity
 LimitCORE=infinity
 LimitNOFILE=999999
-WorkingDirectory=/usr/local/V2bX/
-ExecStart=/usr/local/V2bX/V2bX server
+WorkingDirectory=/usr/local/tox/
+ExecStart=/usr/local/tox/tox server
 Restart=always
 RestartSec=10
 
@@ -207,50 +211,50 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
         systemctl daemon-reload
-        systemctl stop V2bX
-        systemctl enable V2bX
-        echo -e "${green}V2bX ${last_version}${plain} 安装完成，已设置开机自启"
+        systemctl stop tox
+        systemctl enable tox
+        echo -e "${green}tox ${last_version}${plain} 安装完成，已设置开机自启"
     fi
 
-    if [[ ! -f /etc/V2bX/config.json ]]; then
-        cp config.json /etc/V2bX/
+    if [[ ! -f /etc/tox/config.json ]]; then
+        cp config.json /etc/tox/
         echo -e ""
         echo -e "全新安装，请先参看教程：https://v2bx.v-50.me/，配置必要的内容"
         first_install=true
     else
         if [[ x"${release}" == x"alpine" ]]; then
-            service V2bX start
+            service tox start
         else
-            systemctl start V2bX
+            systemctl start tox
         fi
         sleep 2
         check_status
         echo -e ""
         if [[ $? == 0 ]]; then
-            echo -e "${green}V2bX 重启成功${plain}"
+            echo -e "${green}tox 重启成功${plain}"
         else
-            echo -e "${red}V2bX 可能启动失败，请稍后使用 V2bX log 查看日志信息，若无法启动，则可能更改了配置格式，请前往 wiki 查看：https://github.com/V2bX-project/V2bX/wiki${plain}"
+            echo -e "${red}tox 可能启动失败，请稍后使用 tox log 查看日志信息，若无法启动，则可能更改了配置格式，请前往 wiki 查看：https://github.com/V2bX-project/V2bX/wiki${plain}"
         fi
         first_install=false
     fi
 
-    if [[ ! -f /etc/V2bX/dns.json ]]; then
-        cp dns.json /etc/V2bX/
+    if [[ ! -f /etc/tox/dns.json ]]; then
+        cp dns.json /etc/tox/
     fi
-    if [[ ! -f /etc/V2bX/route.json ]]; then
-        cp route.json /etc/V2bX/
+    if [[ ! -f /etc/tox/route.json ]]; then
+        cp route.json /etc/tox/
     fi
-    if [[ ! -f /etc/V2bX/custom_outbound.json ]]; then
-        cp custom_outbound.json /etc/V2bX/
+    if [[ ! -f /etc/tox/custom_outbound.json ]]; then
+        cp custom_outbound.json /etc/tox/
     fi
-    if [[ ! -f /etc/V2bX/custom_inbound.json ]]; then
-        cp custom_inbound.json /etc/V2bX/
+    if [[ ! -f /etc/tox/custom_inbound.json ]]; then
+        cp custom_inbound.json /etc/tox/
     fi
     # 替换脚本下载地址
-    curl -o /usr/bin/V2bX -Ls https://raw.githubusercontent.com/wangn9900/V2bX-script/master/V2bX.sh
-    chmod +x /usr/bin/V2bX
+    curl -o /usr/bin/tox -Ls https://raw.githubusercontent.com/wangn9900/V2bX-script/master/tox.sh
+    chmod +x /usr/bin/tox
     if [ ! -L /usr/bin/v2bx ]; then
-        ln -s /usr/bin/V2bX /usr/bin/v2bx
+        ln -s /usr/bin/tox /usr/bin/v2bx
         chmod +x /usr/bin/v2bx
     fi
 
@@ -389,27 +393,27 @@ EOF
     cd $cur_dir
     rm -f install.sh
     echo -e ""
-    echo "V2bX 管理脚本使用方法 (兼容使用V2bX执行，大小写不敏感): "
+    echo "tox 管理脚本使用方法 (兼容使用V2bX执行，大小写不敏感): "
     echo "------------------------------------------"
-    echo "V2bX              - 显示管理菜单 (功能更多)"
-    echo "V2bX start        - 启动 V2bX"
-    echo "V2bX stop         - 停止 V2bX"
-    echo "V2bX restart      - 重启 V2bX"
-    echo "V2bX status       - 查看 V2bX 状态"
-    echo "V2bX enable       - 设置 V2bX 开机自启"
-    echo "V2bX disable      - 取消 V2bX 开机自启"
-    echo "V2bX log          - 查看 V2bX 日志"
-    echo "V2bX x25519       - 生成 x25519 密钥"
-    echo "V2bX generate     - 生成 V2bX 配置文件"
-    echo "V2bX update       - 更新 V2bX"
-    echo "V2bX update x.x.x - 更新 V2bX 指定版本"
-    echo "V2bX install      - 安装 V2bX"
-    echo "V2bX uninstall    - 卸载 V2bX"
-    echo "V2bX version      - 查看 V2bX 版本"
+    echo "tox              - 显示管理菜单 (功能更多)"
+    echo "tox start        - 启动 tox"
+    echo "tox stop         - 停止 tox"
+    echo "tox restart      - 重启 tox"
+    echo "tox status       - 查看 tox 状态"
+    echo "tox enable       - 设置 tox 开机自启"
+    echo "tox disable      - 取消 tox 开机自启"
+    echo "tox log          - 查看 tox 日志"
+    echo "tox x25519       - 生成 x25519 密钥"
+    echo "tox generate     - 生成 tox 配置文件"
+    echo "tox update       - 更新 tox"
+    echo "tox update x.x.x - 更新 tox 指定版本"
+    echo "tox install      - 安装 tox"
+    echo "tox uninstall    - 卸载 tox"
+    echo "tox version      - 查看 tox 版本"
     echo "------------------------------------------"
     # 首次安装询问是否生成配置文件
     if [[ $first_install == true ]]; then
-        read -rp "检测到你为第一次安装V2bX,是否自动直接生成配置文件？(y/n): " if_generate
+        read -rp "检测到你为第一次安装tox,是否自动直接生成配置文件？(y/n): " if_generate
         if [[ $if_generate == [Yy] ]]; then
             # 替换初始化脚本地址
             curl -o ./initconfig.sh -Ls https://raw.githubusercontent.com/wangn9900/V2bX-script/master/initconfig.sh
