@@ -838,23 +838,22 @@ open_ports() {
 }
 
 show_usage() {
-    echo "V2bX 管理脚本使用方法: "
+    echo "tox 管理脚本使用方法 (兼容使用tox执行，大小写不敏感): "
     echo "------------------------------------------"
-    echo "V2bX              - 显示管理菜单 (功能更多)"
-    echo "V2bX start        - 启动 V2bX"
-    echo "V2bX stop         - 停止 V2bX"
-    echo "V2bX restart      - 重启 V2bX"
-    echo "V2bX status       - 查看 V2bX 状态"
-    echo "V2bX enable       - 设置 V2bX 开机自启"
-    echo "V2bX disable      - 取消 V2bX 开机自启"
-    echo "V2bX log          - 查看 V2bX 日志"
-    echo "V2bX x25519       - 生成 x25519 密钥"
-    echo "V2bX generate     - 生成 V2bX 配置文件"
-    echo "V2bX update       - 更新 V2bX"
-    echo "V2bX update x.x.x - 安装 V2bX 指定版本"
-    echo "V2bX install      - 安装 V2bX"
-    echo "V2bX uninstall    - 卸载 V2bX"
-    echo "V2bX version      - 查看 V2bX 版本"
+    echo "tox              - 显示管理菜单 (功能更多)"
+    echo "tox start        - 启动 tox"
+    echo "tox stop         - 停止 tox"
+    echo "tox restart      - 重启 tox"
+    echo "tox status       - 查看 tox 状态"
+    echo "tox enable       - 设置 tox 开机自启"
+    echo "tox disable      - 取消 tox 开机自启"
+    echo "tox log          - 查看 tox 日志"
+    echo "tox x25519       - 生成 x25519 密钥"
+    echo "tox update       - 更新 tox"
+    echo "tox update x.x.x - 更新 tox 指定版本"
+    echo "tox install      - 安装 tox"
+    echo "tox uninstall    - 卸载 tox"
+    echo "tox version      - 查看 tox 版本"
     echo "------------------------------------------"
 }
 
@@ -1020,32 +1019,32 @@ EOF
 
 show_menu() {
     echo -e "
-  ${green}V2bX 后端管理脚本，使用${plain} ${red}V2bX${plain} ${green}命令运行本脚本${plain}
- ${green} 1.${plain} 安装 V2bX
- ${green} 2.${plain} 更新 V2bX
- ${green} 3.${plain} 卸载 V2bX
- ${green} 4.${plain} 启动 V2bX
- ${green} 5.${plain} 停止 V2bX
- ${green} 6.${plain} 重启 V2bX
- ${green} 7.${plain} 查看 V2bX 状态
- ${green} 8.${plain} 查看 V2bX 日志
- ${green} 9.${plain} 设置 V2bX 开机自启
- ${green}10.${plain} 取消 V2bX 开机自启
+  ${green}tox 后端管理脚本，使用${plain} ${red}tox${plain} ${green}命令运行本脚本${plain}
+ ${green} 1.${plain} 安装 tox
+ ${green} 2.${plain} 更新 tox
+ ${green} 3.${plain} 卸载 tox
+ ${green} 4.${plain} 启动 tox
+ ${green} 5.${plain} 停止 tox
+ ${green} 6.${plain} 重启 tox
+ ${green} 7.${plain} 查看 tox 状态
+ ${green} 8.${plain} 查看 tox 日志
+ ${green} 9.${plain} 设置 tox 开机自启
+ ${green}10.${plain} 取消 tox 开机自启
  ${green}11.${plain} 一键安装 bbr (原版/魔改/plus/锐速)
- ${green}12.${plain} 查看 V2bX 版本 
+ ${green}12.${plain} 查看 tox 版本 
  ${green}13.${plain} 生成 x25519 密钥
- ${green}14.${plain} 升级 V2bX 维护脚本
- ${green}15.${plain} 生成 V2bX 配置文件
+ ${green}14.${plain} 升级 tox 维护脚本
+ ${green}15.${plain} 生成 tox 配置文件
  ${green}16.${plain} 放行 VPS 的所有网络端口
  ${green}17.${plain} 安装/重置 Nginx (8080端口)
  ${green}18.${plain} 卸载 Nginx
  ${green} 0.${plain} 修改配置
  "
     echo
-    if systemctl is-active V2bX &>/dev/null ; then
-        echo -e "V2bX 状态: ${green}已启动${plain}"
+    if systemctl is-active tox &>/dev/null ; then
+        echo -e "tox 状态: ${green}已启动${plain}"
     else
-        echo -e "V2bX 状态: ${red}未启动${plain}"
+        echo -e "tox 状态: ${red}未启动${plain}"
     fi
     echo && read -rp "请输入选择 [0-18]: " num
 
