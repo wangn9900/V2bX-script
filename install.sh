@@ -360,7 +360,6 @@ EOF
                 ;;
         esac
         
-        # Simple Nginx Config
         cat > /etc/nginx/nginx.conf <<EOF
 user root;
 worker_processes auto;
@@ -375,11 +374,21 @@ http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
     
+    log_format main '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                    '\$status \$body_bytes_sent "\$http_referer" '
+                    '"\$http_user_agent" "\$http_x_forwarded_for"';
+
     server {
-        listen 127.0.0.1:8080 http2;
+        listen 127.0.0.1:8080 default_server;
         server_name _;
         root /usr/share/nginx/html;
         index index.html;
+        
+        access_log /var/log/nginx/access_8080.log main;
+        
+        location / {
+            try_files \$uri \$uri/ =404;
+        }
     }
 }
 EOF
